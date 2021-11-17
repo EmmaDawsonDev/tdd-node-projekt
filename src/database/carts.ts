@@ -1,14 +1,14 @@
-interface Cart {
+export interface ICart {
   userLogin: string
-  items: CartItem[]
+  items: ICartItem[]
 }
 
-interface CartItem {
+interface ICartItem {
   productId: string // id för den produkt som refereras till
   amount: number // antal produkter av den sorten
 }
 
-export const cartsDb: Cart[] = [
+export const cartsDb: ICart[] = [
   { userLogin: 'bananpaj', items: [{ productId: '1', amount: 1 }] },
   { userLogin: 'grillkorv', items: [{ productId: '3', amount: 2 }] },
   {
