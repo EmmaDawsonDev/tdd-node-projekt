@@ -3,7 +3,7 @@ export interface IUser {
   login: string // unikt värde, används vid inloggning
 }
 
-export const userDb: IUser[] = [
+export const usersDb: IUser[] = [
   {
     name: 'Pelle',
     login: 'grillkorv',
