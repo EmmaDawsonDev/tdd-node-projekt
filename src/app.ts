@@ -1,13 +1,14 @@
-import express, { RequestHandler } from 'express'
+import express from 'express'
+import productRoutes from './routes/products'
+import userRoutes from './routes/users'
+import cartRoutes from './routes/cart'
 
 const app = express()
 
 app.use(express.json())
 
-const test: RequestHandler = (req, res, next) => {
-  res.send('Hello world')
-}
-
-app.get('/', test)
+app.use('/api/products', productRoutes)
+app.use('/api/users', userRoutes)
+app.use('/api/carts/:userLogin', cartRoutes)
 
 export default app
