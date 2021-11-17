@@ -33,18 +33,27 @@ router.post('/', (req: Request, res: Response) => {
 router.put('/:id', (req: Request, res: Response) => {
   const { id } = req.params
   const update = req.body
-  console.log(id)
-  console.log(update)
 
   if (update.id && update.name && update.price) {
     const index = productsDb.findIndex(product => product.id === id)
     productsDb.splice(index, 1, update)
+
     res.status(200).json({ message: 'Product updated successfully' })
   } else {
     res.status(400).json({ message: 'Invalid product' })
   }
 })
 
-router.delete('/:id', (req: Request, res: Response) => {})
+router.delete('/:id', (req: Request, res: Response) => {
+  const { id } = req.params
+  const index = productsDb.findIndex(product => product.id === id)
+
+  if (index >= 0) {
+    productsDb.splice(index, 1)
+    res.status(200).json({ message: `Product with id ${id} deleted successfully` })
+  } else {
+    res.status(404).json({ message: `Product with id ${id} not found` })
+  }
+})
 
 export default router
