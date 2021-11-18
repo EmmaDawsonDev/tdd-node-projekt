@@ -3,7 +3,7 @@ export interface ICart {
   items: ICartItem[]
 }
 
-interface ICartItem {
+export interface ICartItem {
   productId: string // id för den produkt som refereras till
   amount: number // antal produkter av den sorten
 }
