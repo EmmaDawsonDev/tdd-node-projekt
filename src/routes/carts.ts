@@ -58,8 +58,23 @@ router.put('/:userLogin/:itemId', (req: Request, res: Response) => {
   }
 })
 
+router.delete('/:userLogin/:itemId', (req: Request, res: Response) => {
+  const { userLogin, itemId } = req.params
 
+  const userCart = cartsDb.find(cart => cart.userLogin === userLogin)
 
-router.delete('/:userLogin/:itemId')
+  if (userCart) {
+    const index = userCart.items.findIndex(item => item.productId === itemId)
+
+    if (index >= 0) {
+      userCart.items.splice(index, 1)
+      res.status(200).json({ message: 'Item removed successfully'})
+    } else {
+      res.status(400).json({ message: `Item with productId ${itemId} not found`})
+    }
+  } else {
+    res.status(404).json({ message: 'User cart not found'})
+  }
+})
 
 export default router
