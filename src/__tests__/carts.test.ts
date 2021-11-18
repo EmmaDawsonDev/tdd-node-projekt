@@ -1,3 +1,4 @@
+import { tsObjectKeyword } from "@babel/types"
 import request from "supertest";
 import app from "../app";
 import { ICart, ICartItem } from "../database/carts";
@@ -115,6 +116,31 @@ describe("carts", () => {
       const cartsResponse = await request(app).get('/api/carts/grillkorv')
       expect(cartsResponse.body.length).toBe(2)
       expect(cartsResponse.body).toEqual(expectedCartItems)
+    })
+  })
+  describe('DELETE /:userLogin/:itemId', () => {
+    it('removes an item from the users cart', async () => {
+      const response = await request(app).delete('/api/carts/bananpaj/1')
+
+      expect(response.statusCode).toBe(200)
+      expect(response.body.message).toBe('Item removed successfully')
+
+      const cartsResponse = await request(app).get('/api/carts/bananpaj')
+      expect(cartsResponse.body.length).toBe(0)
+    })
+
+    it('does not remove anything if invalid itemId', async () => {
+      const response = await request(app).delete('/api/carts/bananpaj/3')
+
+      expect(response.statusCode).toBe(400)
+      expect(response.body.message).toBe('Item with productId 3 not found')
+    })
+
+    it('returns 404 if cart does not exist', async () => {
+      const response = await request(app).delete('/api/carts/the_king/2')
+
+      expect(response.statusCode).toBe(404)
+      expect(response.body.message).toBe('User cart not found')
     })
   })
 });
