@@ -11,11 +11,11 @@ export interface ICartItem {
 export const cartsDb: ICart[] = [
   { userLogin: 'bananpaj', items: [{ productId: '1', amount: 1 }] },
   { userLogin: 'grillkorv', items: [{ productId: '3', amount: 2 }] },
-  {
-    userLogin: 'paco',
-    items: [
-      { productId: '2', amount: 1 },
-      { productId: '1', amount: 3 },
-    ],
-  },
+  // {
+  //   userLogin: 'paco',
+  //   items: [
+  //     { productId: '2', amount: 1 },
+  //     { productId: '1', amount: 3 },
+  //   ],
+  // },
 ]
