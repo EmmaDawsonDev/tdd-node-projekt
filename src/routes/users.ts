@@ -1,16 +1,17 @@
 import { Router, Request, Response } from 'express'
-import { usersDb } from '../database/users'
+import * as db from '../database'
 
 const router = Router()
 
 router.get('/', (req: Request, res: Response) => {
-  res.status(200).json(usersDb)
+  const users = db.getAllUsers()
+  res.status(200).json(users)
 })
 
 router.get('/:id',(req: Request, res: Response) => {
   const { id } = req.params
   
-  const user = usersDb.find(user => user.login === id)
+  const user = db.getUserById(id)
 
   if (user) {
     res.status(200).json(user)
@@ -23,7 +24,7 @@ router.post('/', (req: Request, res: Response) => {
   const { user } = req.body
 
   if (user.name && user.login) {
-    usersDb.push(user)
+    db.createUser(user)
     res.status(201).json({ user })
   } else {
     res.status(400).json({ message: 'Invalid user' })
@@ -31,17 +32,15 @@ router.post('/', (req: Request, res: Response) => {
 })
 
 router.delete('/:id', (req: Request, res: Response) => {
- const { id } = req.params
- const index = usersDb.findIndex(user => user.login === id)
+const { id } = req.params
 
- if (index >= 0) {
-   usersDb.splice(index, 1)
+const success = db.deleteUser(id)
 
+if (success) {
    res.status(200).json({ message: `User with login ${id} deleted successfully`})
  } else {
    res.status(404).json({ message: `User with login ${id} not found`})
  }
-
 })
 
 export default router

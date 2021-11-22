@@ -13,7 +13,7 @@ describe('products', () => {
     it('should return an array of products', async () => {
       const response = await request(app).get('/api/products')
 
-      const expected = { id: '1', name: 'A book', price: 120 }
+      const expected: IProduct = { id: '1', name: 'A book', price: 120 }
 
       expect(response.body[0]).toEqual(expected)
     })

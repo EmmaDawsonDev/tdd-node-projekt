@@ -1,16 +1,19 @@
 import { Router, Request, Response } from 'express'
-import { productsDb, IProduct } from '../database/products'
+import { IProduct } from '../database/products'
+import * as db from '../database'
 
 const router = Router()
 
 router.get('/', (req: Request, res: Response) => {
-  res.status(200).json(productsDb)
+  const products = db.getAllProducts()
+
+  res.status(200).json(products)
 })
 
 router.get('/:id', (req: Request, res: Response) => {
   const { id } = req.params
 
-  const product = productsDb.find(product => product.id === id)
+  const product = db.getProductById(id)
 
   if (product) {
     res.status(200).json(product)
@@ -23,7 +26,8 @@ router.post('/', (req: Request, res: Response) => {
   const product: IProduct = req.body.product
   
   if (product.id && product.name && product.price) {
-    productsDb.push(product)
+    db.createProduct(product)
+
     res.status(201).json({ product })
   } else {
     res.status(400).json({ message: 'Invalid product'})
@@ -32,13 +36,16 @@ router.post('/', (req: Request, res: Response) => {
 
 router.put('/:id', (req: Request, res: Response) => {
   const { id } = req.params
-  const update = req.body
+  const update: IProduct = req.body
 
   if (update.id && update.name && update.price) {
-    const index = productsDb.findIndex(product => product.id === id)
-    productsDb.splice(index, 1, update)
+    const success = db.updateProduct(id, update)
 
-    res.status(200).json({ message: 'Product updated successfully' })
+    if (success) {
+      res.status(200).json({ message: 'Product updated successfully' })
+    } else {
+      res.status(404).json({ message: `Product with id ${id} not found` })
+    }
   } else {
     res.status(400).json({ message: 'Invalid product' })
   }
@@ -46,10 +53,10 @@ router.put('/:id', (req: Request, res: Response) => {
 
 router.delete('/:id', (req: Request, res: Response) => {
   const { id } = req.params
-  const index = productsDb.findIndex(product => product.id === id)
 
-  if (index >= 0) {
-    productsDb.splice(index, 1)
+  const success = db.deleteProduct(id)
+  
+  if (success) {
     res.status(200).json({ message: `Product with id ${id} deleted successfully` })
   } else {
     res.status(404).json({ message: `Product with id ${id} not found` })
