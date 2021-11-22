@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express'
-import { cartsDb, ICart, ICartItem } from '../database/carts'
-import { usersDb, IUser } from '../database/users'
-import { productsDb } from '../database/products'
+import { ICart } from '../database/carts'
+import { IUser } from '../database/users'
+
 import * as db from '../database'
 
 const router = Router()
@@ -41,42 +41,25 @@ router.put('/:userLogin/:itemId', (req: Request, res: Response) => {
   const { userLogin, itemId } = req.params
   const updatedAmount: number = req.body.updatedAmount
 
-  const userCart = db.getCartById(userLogin)
+  const userCart: ICart | undefined = db.getCartById(userLogin)
 
-  if (userCart) {
-    const itemToUpdate = userCart.items.find(item => item.productId === itemId)
-    if (itemToUpdate) {
-      db.updateCart(itemToUpdate, updatedAmount)
-      res.status(200).json({ message: 'Cart updated successfully' })
-    } else {
-      const productToBeAdded = productsDb.find(product => product.id === itemId)
-      if (!productToBeAdded) {
-        res.status(400).json({ message: 'Invalid product' })
-      } else {
-        userCart.items.push({ productId: itemId, amount: updatedAmount })
-        res.status(201).json({ message: 'Cart updated successfully' })
-      }
-    }
+  const success = db.updateCart(userCart, updatedAmount, itemId)
+  if (success) {
+    res.status(200).json({ message: 'Cart updated successfully' })
+  } else {
+    res.status(400).json({ message: 'Cart or product does not exist' })
   }
 })
 
 router.delete('/:userLogin/:itemId', (req: Request, res: Response) => {
   const { userLogin, itemId } = req.params
 
-  const userCart = cartsDb.find(cart => cart.userLogin === userLogin)
+  const userCart = db.getCartById(userLogin)
 
-  if (userCart) {
-    const index = userCart.items.findIndex(item => item.productId === itemId)
-
-    if (index >= 0) {
-      userCart.items.splice(index, 1)
-      res.status(200).json({ message: 'Item removed successfully'})
-    } else {
-      res.status(400).json({ message: `Item with productId ${itemId} not found`})
-    }
-  } else {
-    res.status(404).json({ message: 'User cart not found'})
-  }
+  const response = db.deleteCartItem(userCart, itemId)!
+  res.status(response.status).json({ message: response.message })
 })
 
 export default router
+
+

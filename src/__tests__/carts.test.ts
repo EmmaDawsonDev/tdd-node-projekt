@@ -98,14 +98,14 @@ describe("carts", () => {
       const response = await request(app).put('/api/carts/grillkorv/10').send({ updatedAmount })
 
       expect(response.statusCode).toBe(400)
-      expect(response.body.message).toBe('Invalid product')
+      expect(response.body.message).toBe('Cart or product does not exist')
     })
     it('adds a new product to cart.items if it exists in products ', async () => {
       const updatedAmount = 2
 
       const response = await request(app).put('/api/carts/grillkorv/2').send({ updatedAmount })
 
-      expect(response.statusCode).toBe(201)
+      expect(response.statusCode).toBe(200)
       expect(response.body.message).toBe('Cart updated successfully')
 
       const expectedCartItems: ICartItem[] = [

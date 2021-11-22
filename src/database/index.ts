@@ -1,6 +1,6 @@
 import { usersDb, IUser } from './users'
 import { productsDb, IProduct } from './products'
-import { cartsDb, ICart, ICartItem } from './carts'
+import { cartsDb, ICart } from './carts'
 
 // USERS
 
@@ -23,7 +23,7 @@ export const deleteUser = (id: string) => {
 
   if (index >= 0) {
     usersDb.splice(index, 1)
-    
+
     return true
   } else {
     return false
@@ -62,11 +62,10 @@ export const deleteProduct = (id: string) => {
 
   if (index >= 0) {
     productsDb.splice(index, 1)
-   return true
+    return true
   } else {
     return false
   }
-
 }
 
 // CARTS
@@ -81,6 +80,37 @@ export const createCart = (cart: ICart) => {
   cartsDb.push(cart)
 }
 
-export const updateCart = (itemToUpdate: ICartItem, updatedAmount: number) => {
-  itemToUpdate.amount += updatedAmount
+export const updateCart = (userCart: ICart | undefined, updatedAmount: number, itemId: string) => {
+  if (userCart) {
+    const itemToUpdate = userCart.items.find(item => item.productId === itemId)
+    if (itemToUpdate) {
+      itemToUpdate.amount += updatedAmount
+      return true
+    } else {
+      const productToBeAdded = getProductById(itemId)
+      if (!productToBeAdded) {
+        return false
+      } else {
+        userCart.items.push({ productId: itemId, amount: updatedAmount })
+        return true
+      }
+    }
+  } else {
+    return false
+  }
+}
+
+export const deleteCartItem = (userCart: ICart | undefined, itemId: string) => {
+  if (userCart) {
+    const index = userCart.items.findIndex(item => item.productId === itemId)
+
+    if (index >= 0) {
+      userCart.items.splice(index, 1)
+      return { status: 200, message: 'Item removed successfully' }
+    } else {
+      return { status: 400, message: `Item with productId ${itemId} not found` }
+    }
+  } else {
+    return { status: 404, message: 'User cart not found' }
+  }
 }
